@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  db:
+    container_name: "demoapp-postgres"
+    platform: linux/x86_64
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: demoapp
+      POSTGRES_PASSWORD: demoapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - "demoapp_dbdata:/var/lib/postgresql/data"
+
+  redis:
+    container_name: "demoapp-redis"
+    platform: linux/x86_64
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - demoapp_redis_data:/data
+
+  app:
+    container_name: "demoapp-api"
+    platform: linux/x86_64
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      # RAILS_LOG_TO_STDOUT: '1'
+      # RAILS_SERVE_STATIC_FILES: 'true'
+      # BUNDLE_WITHOUT: 'development:test'
+      LANG: en_US.UTF-8
+      LOG_LEVEL: DEBUG
+      RACK_ENV: development
+      RAILS_ENV: development
+      REDIS_URL: redis://redis:6379
+      POSTGRES_USER: demoapp
+      POSTGRES_PASSWORD: demoapp
+      POSTGRES_HOST: db
+    volumes:
+      - .:/app
+      - demoapp_bundle:/usr/local/bundle
+    working_dir: /app
+    # Keeps the stdin open, so we can attach to our app container's process and
+    # do stuff such as `byebug` or `binding.pry`:
+    stdin_open: true
+    # Allows us to send signals (CTRL+C, CTRL+P + CTRL+Q) into the container
+    tty: true
+
+volumes:
+  demoapp_dbdata:
+  demoapp_redis_data:
+  demoapp_bundle:
