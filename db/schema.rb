@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_10_153404) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_10_164619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -25,6 +25,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_10_153404) do
     t.boolean "on_hold", default: false
     t.uuid "checked_out_by_id"
     t.uuid "on_hold_by_id"
+    t.datetime "checked_out_at"
+    t.datetime "due_at"
     t.index ["checked_out_by_id"], name: "index_books_on_checked_out_by_id"
     t.index ["on_hold_by_id"], name: "index_books_on_on_hold_by_id"
   end

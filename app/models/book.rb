@@ -4,6 +4,8 @@
 #
 #  id                :uuid             not null, primary key
 #  checked_out       :boolean          default(FALSE), not null
+#  checked_out_at    :datetime
+#  due_at            :datetime
 #  on_hold           :boolean          default(FALSE)
 #  restricted        :boolean          default(FALSE), not null
 #  title             :string           not null
@@ -25,4 +27,20 @@
 class Book < ApplicationRecord
   belongs_to :checked_out_by, class_name: 'User', optional: true
   belongs_to :on_hold_by, class_name: 'User', optional: true
+
+  before_save :apply_due_at
+
+  def overdue?
+    return false if due_at.nil?
+
+    due_at.beginning_of_day < Date.current
+  end
+
+  private
+
+  def apply_due_at
+    return if saved_changes[:checked_out_at].nil?
+
+    self.due_at = saved_changes[:checked_out_at].last.nil? ? nil : 60.days.from_now
+  end
 end

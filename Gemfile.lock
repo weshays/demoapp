@@ -325,6 +325,7 @@ GEM
     spring (4.1.1)
     thor (1.2.2)
     tilt (2.2.0)
+    timecop (0.9.6)
     timeout (0.4.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -372,6 +373,7 @@ DEPENDENCIES
   shoulda-matchers (~> 4.5.1)
   simplecov (~> 0.21.2)
   spring
+  timecop
 
 RUBY VERSION
    ruby 3.2.1p31

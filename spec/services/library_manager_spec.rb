@@ -64,6 +64,17 @@ RSpec.describe LibraryManager, type: :service do
         book = FactoryBot.create(:circulating_book)
         expect(LibraryManager.place_hold(patron, book)).to eq(false)
       end
+
+      it 'should not be able to place hold with more than two overdue checkouts' do
+        FactoryBot.create_list(:overdue_book, 3, checked_out_by: patron)
+        book = FactoryBot.create(:circulating_book)
+        expect(LibraryManager.place_hold(patron, book)).to eq(false)
+      end
+
+      it 'should be able to checkout a book on hold if the hold and checkout are the same person' do
+        book = FactoryBot.create(:book_on_hold, on_hold_by: patron)
+        expect(LibraryManager.checkout(patron, book)).to eq(true)
+      end
     end
   end
 
@@ -118,6 +129,12 @@ RSpec.describe LibraryManager, type: :service do
       end
 
       it 'should be able to place a book on hold' do
+        book = FactoryBot.create(:circulating_book)
+        expect(LibraryManager.place_hold(researcher, book)).to eq(true)
+      end
+
+      it 'should be able to place more than 5 books on hold' do
+        FactoryBot.create_list(:book_on_hold, 5, on_hold_by: researcher)
         book = FactoryBot.create(:circulating_book)
         expect(LibraryManager.place_hold(researcher, book)).to eq(true)
       end

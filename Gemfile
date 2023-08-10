@@ -94,7 +94,7 @@ group :test do
   gem 'shoulda-matchers', "~> 4.5.1"
   gem 'simplecov', "~> 0.21.2", require: false
   # gem 'stripe-ruby-mock', '~> 3.0.1', require: 'stripe_mock'
-  # gem 'timecop'
+  gem 'timecop'
   # gem 'vcr', "~> 6.1.0"
   # gem 'webmock', "~> 3.18.1"
   # # gem 'zonebie'

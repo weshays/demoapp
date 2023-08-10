@@ -14,6 +14,13 @@
 #  index_users_on_researcher  (researcher)
 #
 class User < ApplicationRecord
-  has_many :books_checked_out, class_name: 'Book', foreign_key: :checked_out_by
-  has_many :books_on_hold, class_name: 'Book', foreign_key: :on_hold_by
+  MAX_OVERDUE_BOOKS_BEFORE_REJECTING_HOLD = 2
+
+  has_many :books_checked_out, class_name: 'Book', foreign_key: :checked_out_by, dependent: :nullify,
+                               inverse_of: :checked_out_by
+  has_many :books_on_hold, class_name: 'Book', foreign_key: :on_hold_by, dependent: :nullify, inverse_of: :on_hold_by
+
+  def max_overdue_books_reached?
+    books_checked_out.select(&:overdue?).size >= MAX_OVERDUE_BOOKS_BEFORE_REJECTING_HOLD
+  end
 end

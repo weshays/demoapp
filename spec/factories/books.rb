@@ -4,6 +4,8 @@
 #
 #  id                :uuid             not null, primary key
 #  checked_out       :boolean          default(FALSE), not null
+#  checked_out_at    :datetime
+#  due_at            :datetime
 #  on_hold           :boolean          default(FALSE)
 #  restricted        :boolean          default(FALSE), not null
 #  title             :string           not null
@@ -66,6 +68,12 @@ FactoryBot.define do
       checked_out { false }
       restricted { true }
       on_hold { true }
+    end
+
+    factory :overdue_book do
+      checked_out { true }
+      checked_out_at { 61.days.ago }
+      due_at { 1.day.ago }
     end
   end
 end
