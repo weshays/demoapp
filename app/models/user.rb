@@ -14,4 +14,6 @@
 #  index_users_on_researcher  (researcher)
 #
 class User < ApplicationRecord
+  has_many :books_checked_out, class_name: 'Book', foreign_key: :checked_out_by
+  has_many :books_on_hold, class_name: 'Book', foreign_key: :on_hold_by
 end
