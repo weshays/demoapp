@@ -1,6 +1,4 @@
 class LibraryManager
-  MAX_BOOKS_ON_HOLD = 5
-
   def self.checkout(user, book)
     obj = new(user, book)
     obj.checkout
@@ -37,7 +35,7 @@ class LibraryManager
   end
 
   def checked_out?
-    @book.checked_out?
+    @book.checked_out_at.present?
   end
 
   def restricted?
@@ -45,30 +43,35 @@ class LibraryManager
   end
 
   def on_hold?
-    @book.on_hold?
+    @book.on_hold_at.present?
   end
 
   def cancel_hold
-    return false unless @book.on_hold?
+    return false if @book.on_hold_at.blank?
 
-    @book.update(on_hold: false, on_hold_by_id: nil)
+    @book.update(on_hold_at: nil, on_hold_by_id: nil)
   end
 
   def checkout
-    return false if @book.on_hold? && @book.on_hold_by_id != @user.id
-    return false if @book.checked_out?
+    return false if @book.on_hold_at.present? && @book.on_hold_by_id != @user.id
+    return false if @book.checked_out_at.present?
     return false if @book.restricted? && !@user.researcher?
 
-    @book.update(checked_out: true, checked_out_by_id: @user.id, on_hold: false, on_hold_by_id: nil)
+    @book.update(
+      checked_out_at: Time.current,
+      checked_out_by_id: @user.id,
+      on_hold_at: nil,
+      on_hold_by_id: nil
+    )
   end
 
   def place_hold
-    return false if @user.max_overdue_books_reached?
-    return false if @user.books_on_hold.count >= MAX_BOOKS_ON_HOLD && !@user.researcher?
-    return false if @book.on_hold?
-    return false if @book.checked_out?
+    return false if @user.max_overdue_books_reached?(@book.library)
+    return false if @user.max_books_on_hold_for_non_researcher?
+    return false if @book.on_hold_at.present?
+    return false if @book.checked_out_at.present?
     return false if @book.restricted? && !@user.researcher?
 
-    @book.update(on_hold: true, on_hold_by_id: @user.id)
+    @book.update(on_hold_at: Time.current, on_hold_by_id: @user.id)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_10_164619) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_10_193226) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -18,17 +18,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_10_164619) do
 
   create_table "books", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title", null: false
-    t.boolean "checked_out", default: false, null: false
     t.boolean "restricted", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "on_hold", default: false
     t.uuid "checked_out_by_id"
     t.uuid "on_hold_by_id"
     t.datetime "checked_out_at"
     t.datetime "due_at"
+    t.datetime "on_hold_at"
+    t.datetime "on_hold_expires_at"
+    t.uuid "library_id", null: false
     t.index ["checked_out_by_id"], name: "index_books_on_checked_out_by_id"
+    t.index ["library_id"], name: "index_books_on_library_id"
     t.index ["on_hold_by_id"], name: "index_books_on_on_hold_by_id"
+  end
+
+  create_table "libraries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -40,6 +46,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_10_164619) do
     t.index ["researcher"], name: "index_users_on_researcher"
   end
 
+  add_foreign_key "books", "libraries"
   add_foreign_key "books", "users", column: "checked_out_by_id"
   add_foreign_key "books", "users", column: "on_hold_by_id"
 end

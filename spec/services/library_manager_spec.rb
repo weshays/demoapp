@@ -50,6 +50,7 @@ RSpec.describe LibraryManager, type: :service do
 
       it 'should be able to cancel a hold so it can be placed on hold again' do
         book = FactoryBot.create(:book_on_hold)
+        expect(LibraryManager.on_hold?(patron, book)).to eq(true)
         expect(LibraryManager.cancel_hold(patron, book)).to eq(true)
         expect(LibraryManager.place_hold(patron, book)).to eq(true)
       end
@@ -66,8 +67,9 @@ RSpec.describe LibraryManager, type: :service do
       end
 
       it 'should not be able to place hold with more than two overdue checkouts' do
-        FactoryBot.create_list(:overdue_book, 3, checked_out_by: patron)
-        book = FactoryBot.create(:circulating_book)
+        library = FactoryBot.create(:library)
+        FactoryBot.create_list(:overdue_book, 3, library: library, checked_out_by: patron)
+        book = FactoryBot.create(:circulating_book, library: library)
         expect(LibraryManager.place_hold(patron, book)).to eq(false)
       end
 
