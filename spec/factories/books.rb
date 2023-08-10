@@ -11,11 +11,11 @@
 #
 FactoryBot.define do
   factory :book do
-    name { Forgery(:name).full_name }
+    title { Forgery(:name).full_name }
     checked_out { false }
 
     factory :checked_out_book do
-      restricted { true }
+      checked_out { true }
     end
 
     factory :restricted_book do
@@ -23,6 +23,7 @@ FactoryBot.define do
     end
 
     factory :restricted_and_checked_out_book do
+      checked_out { true }
       restricted { true }
     end
   end
